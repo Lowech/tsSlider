@@ -71,7 +71,7 @@ declare global {
     if(event.clientX<=bandContainer.getBoundingClientRect().right && 
     event.clientX>=bandContainer.getBoundingClientRect().left){
       if(event.target===backgroundMinCircle.backgroundMinCircle){
-        backgroundMinCircle.backgroundMinCircle.addEventListener("mousemove",setsMinValue);
+        backgroundMinCircle.backgroundMinCircle.addEventListener("mousemove", setsMinValue);
         
       }
       if(event.target===backgroundMaxCircle.backgroundMaxCircle){
@@ -114,6 +114,45 @@ declare global {
     
     sumMin.sumMin.value=`${Math.trunc(event.clientX-bandContainer.getBoundingClientRect().left)} ₽`;
   }
+  }
+  console.log(backgroundMaxCircle.backgroundMaxCircle.getBoundingClientRect().top)
+  function verticalMovement(event){
+    if(settings.verticalPosition===true){
+
+      sumMax.verticalPosition();
+      sumMin.verticalPosition();
+      backgroundMinCircle.verticalPosition();
+      backgroundMin.verticalPosition();
+      backgroundMaxCircle.verticalPosition();
+      backgroundMax.verticalPosition();
+
+      rangeSlider.classList.add("range-slider_vertical-position");
+      sumBlock.classList.add("sum-block_vertical-position");
+      bandContainer.classList.add("band-container_vertical-position");
+
+        if(event.clientY>=bandContainer.getBoundingClientRect().bottom || 
+        event.clientY<=bandContainer.getBoundingClientRect().top || 
+        event.clientY>=backgroundMaxCircle.backgroundMaxCircle.getBoundingClientRect().top){
+          return;
+        }
+      else{
+      
+        backgroundMinCircle.backgroundMinCircle.style.top=event.clientX-bandContainer.getBoundingClientRect().top-8+"px";
+        backgroundMin.backgroundMin.style.height=event.clientX-bandContainer.getBoundingClientRect().top+2+"px";
+        
+        sumMin.sumMin.value=`${Math.trunc(event.clientX-bandContainer.getBoundingClientRect().top)} ₽`;
+      }
+      if(event.clientX>=bandContainer.getBoundingClientRect().right || 
+      event.clientX<=bandContainer.getBoundingClientRect().top ){
+        return;
+      }
+    else{
+      backgroundMaxCircle.backgroundMaxCircle.style.top=event.clientX-bandContainer.getBoundingClientRect().top-8+"px";
+      backgroundMax.backgroundMax.style.height=event.target.getBoundingClientRect().top-bandContainer.getBoundingClientRect().top+2+"px";
+    
+      sumMax.sumMax.value=`${Math.trunc(event.clientX-bandContainer.getBoundingClientRect().top)} ₽`;
+    } 
+    }
   }
   ////////
   document.addEventListener("mouseup",function(event){

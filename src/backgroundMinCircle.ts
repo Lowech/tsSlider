@@ -4,7 +4,7 @@ export class BackgroundMinCircle{
         this.backgroundMinCircle= backgroundMinCircle;
         this.backgroundMinCircle.classList.add("background-min__circle");
     }
-    sum(){
-        
+    verticalPosition(){
+        this.backgroundMinCircle.classList.add("background-min__circle_vertical-position");
     }
 }

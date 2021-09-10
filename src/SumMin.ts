@@ -10,6 +10,9 @@
         this.sumMin.value="5 000₽";
         console.log(this.sumMin)
     }
+    verticalPosition(){
+        this.sumMin.classList.add("sum-min_vertical-position");
+    }
 }
 
  

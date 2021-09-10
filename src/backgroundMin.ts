@@ -4,7 +4,7 @@ export class BackgroundMin{
         this.backgroundMin= backgroundMin;
         this.backgroundMin.classList.add("background-min");
     }
-    sum(){
-        
+    verticalPosition(){
+        this.backgroundMin.classList.add("background-min_vertical-position");
     }
 }

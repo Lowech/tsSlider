@@ -4,7 +4,7 @@ export class BackgroundMaxCircle{
         this.backgroundMaxCircle= backgroundMaxCircle;
         this.backgroundMaxCircle.classList.add("background-max__circle");
     }
-    sum(){
-        
+    verticalPosition(){
+        this.backgroundMaxCircle.classList.add("background-max__circle_vertical-position");
     }
 }
