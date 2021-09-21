@@ -20,19 +20,49 @@ declare global {
         verticalPosition: false 
       },options);
       
-    const sumMin=  new SumMin(document.createElement("input"));
-    const sumMax= new SumMax(document.createElement("input"));
-    const backgroundMinCircle= new BackgroundMinCircle(document.createElement("div"));
-    const backgroundMaxCircle= new BackgroundMaxCircle(document.createElement("div"));
-    const backgroundMin = new BackgroundMin(document.createElement("div"));
-    const backgroundMax = new BackgroundMax(document.createElement("div"));
-    sumMin.sum();
-    sumMax.sum();
-    console.log();
-      return this.each(function(event){
+    
+   
+      return this.each(function(event: any){
         
   /*************************view block********************************************/
-  
+  class View {
+    SumMin: any
+    SumMax: any
+    BackgroundMinCircle: any
+    BackgroundMaxCircle: any
+    BackgroundMin: any
+    BackgroundMax: any
+    constructor(
+      SumMin: any,
+      SumMax: any,
+      BackgroundMinCircle: any,
+      BackgroundMaxCircle: any,
+      BackgroundMin: any,
+      BackgroundMax: any){
+      this.SumMin=SumMin;
+      this.SumMax=SumMax;
+      this.BackgroundMinCircle=BackgroundMinCircle;
+      this.BackgroundMaxCircle=BackgroundMaxCircle;
+      this.BackgroundMin=BackgroundMin;
+      this.BackgroundMax=BackgroundMax;
+    }
+    SumMinValue(){     
+this.SumMin.sum() 
+    }
+    SumMaxValue(){     
+      this.SumMax.sum() 
+          }
+  }
+const subView=  new View(
+  new SumMin(document.createElement("input")),
+  new SumMax(document.createElement("input")),
+  new BackgroundMinCircle(document.createElement("div")),
+  new BackgroundMaxCircle(document.createElement("div")),
+  new BackgroundMin(document.createElement("div")),
+  new BackgroundMax(document.createElement("div")));
+subView.SumMinValue();
+subView.SumMaxValue();
+
         let  rangeSlider= document.createElement("div");
         rangeSlider.classList.add("range-slider");
   
@@ -43,88 +73,135 @@ declare global {
         bandContainer.classList.add("band-container");
   
         let  rangeSliderText=document.createElement("div");
+
+    rangeSlider.append(sumBlock,bandContainer,rangeSliderText);
+    sumBlock.append(subView.SumMin.sumMin,subView.SumMax.sumMax);
+    bandContainer.append(subView.BackgroundMin.backgroundMin,subView.BackgroundMax.backgroundMax);
+    subView.BackgroundMin.backgroundMin.append(subView.BackgroundMinCircle.backgroundMinCircle);
+    subView.BackgroundMax.backgroundMax.append(subView.BackgroundMaxCircle.backgroundMaxCircle);
+    this.append(rangeSlider)
         //rangeSliderText.classList.add("range-slider-text");
   /************************* end view block ********************************************/
  
   /************************* model block ********************************************/
+    class Model{
+      constructor(){
+
+      }
+      
+      valueСhanges(event: { clientX: number; target: any }){
+        
+          if(event.clientX<=bandContainer.getBoundingClientRect().right && 
+          event.clientX>=bandContainer.getBoundingClientRect().left){
+            
+          return  subPresenter.jp(true,event); 
+          }
+      }
+      setsMinValue(event: { clientX: number; target: any }) {
+        
+        if(event.target.className==="background-min__circle"){
+          if(event.clientX>=bandContainer.getBoundingClientRect().right || 
+          event.clientX<=bandContainer.getBoundingClientRect().left || 
+          event.clientX>=subView.BackgroundMaxCircle.backgroundMaxCircle.getBoundingClientRect().left){
+            return;
+          }
+        else{
+        
+          subView.BackgroundMinCircle.backgroundMinCircle.style.left=event.clientX-bandContainer.getBoundingClientRect().left-8+"px";
+          subView.BackgroundMin.backgroundMin.style.width=event.clientX-bandContainer.getBoundingClientRect().left+2+"px";
+          
+          subView.SumMin.sumMin.value=`${Math.trunc(event.clientX-bandContainer.getBoundingClientRect().left)} ₽`;
+        }
+        }
+        
+      }
+    }
+    const subModel= new Model();
     
     //rangeSliderText.innerHTML="Стоимость за сутки пребывания в номере";
   
-    rangeSlider.append(sumBlock,bandContainer,rangeSliderText);
-    sumBlock.append(sumMin.sumMin,sumMax.sumMax);
-    bandContainer.append(backgroundMin.backgroundMin,backgroundMax.backgroundMax);
-    backgroundMin.backgroundMin.append(backgroundMinCircle.backgroundMinCircle);
-    backgroundMax.backgroundMax.append(backgroundMaxCircle.backgroundMaxCircle);
-    this.append(rangeSlider)
-  
     //leftArrowNumberBlock.innerHTML="<span class=left-arrow-number>1</span>";
-  console.log(backgroundMax.backgroundMax)
-    
-        
+  
   /************************* end model block ********************************************/
   if(settings.oneRange===true){
-    backgroundMin.backgroundMin.style.display="none";
+    subView.BackgroundMin.backgroundMin.style.display="none";
   }
   
   /************************* controller block ********************************************/
-  document.addEventListener("mousedown",function valueСhanges(event){
-    if(event.clientX<=bandContainer.getBoundingClientRect().right && 
-    event.clientX>=bandContainer.getBoundingClientRect().left){
-      if(event.target===backgroundMinCircle.backgroundMinCircle){
-        backgroundMinCircle.backgroundMinCircle.addEventListener("mousemove", setsMinValue);
-        
-      }
-      if(event.target===backgroundMaxCircle.backgroundMaxCircle){
-        
-        backgroundMaxCircle.backgroundMaxCircle.addEventListener("mousemove",setsMaxValue);
-        
-      }
+  class Presenter{
+    subModel: any
+    subView: any
+    constructor(subModel: any,subView: any){
+this.subModel=subModel;
+this.subView=subView;
+
+    }
+    mouseup(event: MouseEvent){
       
-      //console.log(bandBorder.getBoundingClientRect().width-event.clientX-bandContainer.getBoundingClientRect().left)
+          subView.BackgroundMaxCircle.backgroundMaxCircle.removeEventListener('mousemove',setsMaxValue);
+          subView.BackgroundMinCircle.backgroundMinCircle.removeEventListener('mousemove', this.subModel.setsMinValue(event));
+       
     }
     
-    //console.log(event.target.getBoundingClientRect().left-bandContainer.getBoundingClientRect().left)
-    
-  });
+    mousedown(event: MouseEvent){
+      console.log(this.subModel.setsMinValue(event))
+      this.subModel.valueСhanges(event) 
+      };
+      jp(y: boolean,event: { clientX?: number; target: any; }){
+        
+        
+        if(y===true){
+          
+          if(event.target===this.subView.BackgroundMinCircle.backgroundMinCircle){
+             
+            this.subView.BackgroundMinCircle.backgroundMinCircle.addEventListener("mousemove",( event: any )=> this.subModel.setsMinValue(event));
+          }
+          if(event.target===this.subView.BackgroundMaxCircle.backgroundMaxCircle){
+            this.subView.BackgroundMaxCircle.backgroundMaxCircle.addEventListener("mousemove",setsMaxValue);  
+          } 
+        }
+        
+      }
+    }
+  
+  
+
+  document.addEventListener("mousedown", (event)=>
+  subPresenter.mousedown(event) );
+  
+  document.addEventListener("mouseup",(event)=>
+    subPresenter.mouseup(event)
+  );
+  
+  const subPresenter = new Presenter(subModel,subView);
+  
+  //
   ////////
-  function setsMaxValue(event){
+  function setsMaxValue(event: { clientX: number; target: { getBoundingClientRect: () => { (): any; new(): any; left: number; }; }; }){
     if(event.clientX>=bandContainer.getBoundingClientRect().right || 
     event.clientX<=bandContainer.getBoundingClientRect().left ){
       return;
     }
   else{
-    backgroundMaxCircle.backgroundMaxCircle.style.left=event.clientX-bandContainer.getBoundingClientRect().left-8+"px";
-    backgroundMax.backgroundMax.style.width=event.target.getBoundingClientRect().left-bandContainer.getBoundingClientRect().left+2+"px";
+    subView.BackgroundMaxCircle.backgroundMaxCircle.style.left=event.clientX-bandContainer.getBoundingClientRect().left-8+"px";
+    subView.BackgroundMax.backgroundMax.style.width=event.target.getBoundingClientRect().left-bandContainer.getBoundingClientRect().left+2+"px";
   
-    sumMax.sumMax.value=`${Math.trunc(event.clientX-bandContainer.getBoundingClientRect().left)} ₽`;
+    subView.SumMax.sumMax.value=`${Math.trunc(event.clientX-bandContainer.getBoundingClientRect().left)} ₽`;
   }
   }
   ////////
   ////////
-  function setsMinValue(event){
-    if(event.clientX>=bandContainer.getBoundingClientRect().right || 
-    event.clientX<=bandContainer.getBoundingClientRect().left || 
-    event.clientX>=backgroundMaxCircle.backgroundMaxCircle.getBoundingClientRect().left){
-      return;
-    }
-  else{
   
-    backgroundMinCircle.backgroundMinCircle.style.left=event.clientX-bandContainer.getBoundingClientRect().left-8+"px";
-    backgroundMin.backgroundMin.style.width=event.clientX-bandContainer.getBoundingClientRect().left+2+"px";
-    
-    sumMin.sumMin.value=`${Math.trunc(event.clientX-bandContainer.getBoundingClientRect().left)} ₽`;
-  }
-  }
-  console.log(backgroundMaxCircle.backgroundMaxCircle.getBoundingClientRect().top)
-  function verticalMovement(event){
+  
+  function verticalMovement(event: { clientY: number; clientX: number; target: { getBoundingClientRect: () => { (): any; new(): any; top: number; }; }; }){
     if(settings.verticalPosition===true){
 
-      sumMax.verticalPosition();
-      sumMin.verticalPosition();
-      backgroundMinCircle.verticalPosition();
-      backgroundMin.verticalPosition();
-      backgroundMaxCircle.verticalPosition();
-      backgroundMax.verticalPosition();
+      subView.SumMax.sumMax.verticalPosition();
+      subView.SumMin.sumMin.verticalPosition();
+      subView.BackgroundMinCircle.verticalPosition();
+      subView.BackgroundMin.verticalPosition();
+      subView.BackgroundMaxCircle.verticalPosition();
+      subView.BackgroundMax.verticalPosition();
 
       rangeSlider.classList.add("range-slider_vertical-position");
       sumBlock.classList.add("sum-block_vertical-position");
@@ -132,33 +209,30 @@ declare global {
 
         if(event.clientY>=bandContainer.getBoundingClientRect().bottom || 
         event.clientY<=bandContainer.getBoundingClientRect().top || 
-        event.clientY>=backgroundMaxCircle.backgroundMaxCircle.getBoundingClientRect().top){
+        event.clientY>=subView.BackgroundMaxCircle.backgroundMaxCircle.getBoundingClientRect().top){
           return;
         }
       else{
       
-        backgroundMinCircle.backgroundMinCircle.style.top=event.clientX-bandContainer.getBoundingClientRect().top-8+"px";
-        backgroundMin.backgroundMin.style.height=event.clientX-bandContainer.getBoundingClientRect().top+2+"px";
+        subView.BackgroundMinCircle.backgroundMinCircle.style.top=event.clientX-bandContainer.getBoundingClientRect().top-8+"px";
+        subView.BackgroundMin.backgroundMin.style.height=event.clientX-bandContainer.getBoundingClientRect().top+2+"px";
         
-        sumMin.sumMin.value=`${Math.trunc(event.clientX-bandContainer.getBoundingClientRect().top)} ₽`;
+        subView.SumMin.sumMin.value=`${Math.trunc(event.clientX-bandContainer.getBoundingClientRect().top)} ₽`;
       }
       if(event.clientX>=bandContainer.getBoundingClientRect().right || 
       event.clientX<=bandContainer.getBoundingClientRect().top ){
         return;
       }
     else{
-      backgroundMaxCircle.backgroundMaxCircle.style.top=event.clientX-bandContainer.getBoundingClientRect().top-8+"px";
-      backgroundMax.backgroundMax.style.height=event.target.getBoundingClientRect().top-bandContainer.getBoundingClientRect().top+2+"px";
+      subView.BackgroundMaxCircle.backgroundMaxCircle.style.top=event.clientX-bandContainer.getBoundingClientRect().top-8+"px";
+      subView.BackgroundMax.backgroundMax.style.height=event.target.getBoundingClientRect().top-bandContainer.getBoundingClientRect().top+2+"px";
     
-      sumMax.sumMax.value=`${Math.trunc(event.clientX-bandContainer.getBoundingClientRect().top)} ₽`;
+      subView.SumMax.sumMax.value=`${Math.trunc(event.clientX-bandContainer.getBoundingClientRect().top)} ₽`;
     } 
     }
   }
   ////////
-  document.addEventListener("mouseup",function(event){
-    backgroundMaxCircle.backgroundMaxCircle.removeEventListener('mousemove',setsMaxValue);
-    backgroundMinCircle.backgroundMinCircle.removeEventListener('mousemove',setsMinValue);
-  });
+  
     });
   }
   })(jQuery);
