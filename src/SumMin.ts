@@ -6,10 +6,6 @@
         this.sumMin= sumMin;
         this.sumMin.classList.add("sum-min");
     }
-    sum(){
-        this.sumMin.value="5 000₽";
-        
-    }
     verticalPosition(){
         this.sumMin.classList.add("sum-min_vertical-position");
     }
